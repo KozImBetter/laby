@@ -18,7 +18,7 @@ print(laby)
 
 print(laby.get_contiguous_cells((0,1)))
 print(laby.get_reachable_cells((0,1)))
-"""
+
 laby = Maze(5, 5)
 laby.empty()
 laby.fill()
@@ -30,3 +30,7 @@ print(laby)
 print(laby.get_walls())
 print(laby.get_contiguous_cells((0,1)))
 print(laby.get_reachable_cells((0,1)))
+"""
+
+laby = Maze.gen_btree(4, 4)
+print(laby)

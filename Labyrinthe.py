@@ -1,4 +1,5 @@
 # RYSMAN Karim, DEUTSCHE Sacha
+from random import randint
 
 class Maze:
     """
@@ -211,3 +212,33 @@ class Maze:
             if cells in self.neighbors and c in self.neighbors[cells]:
                 L_reachable_cells.append(cells)
         return L_reachable_cells
+
+    @classmethod
+    def gen_btree(cls, h: int, w: int):
+        """
+        Génère un labyrinthe utilisant l'algorithme de construction par arbre binaire.
+
+        :param h: le nombre de lignes du labyrinthe
+        :param w: le nombre de colonnes du labyrinthe
+        :return: un objet Maze représentant le labyrinthe généré
+        """
+        maze = cls(h, w)
+        maze.fill()
+
+        for i in range(0, h):
+            for j in range(0, w):
+                L_Murs = []
+                # On vérifie si (i,j) possède des voisins et si (i, j + 1) fait parti de ses voisins. De plus
+                # on vérifie si j+1 est un mur supprimable
+                if not((i, j) in maze.neighbors and (i, j + 1) in maze.neighbors[(i, j)]) and j + 1 < w:
+                    L_Murs.append((i, j + 1))
+
+                # On vérifie si (i,j) possède des voisins et si (i + 1, j) fait parti de ses voisins. De plus
+                # on vérifie si i+1 est un mur supprimable
+                if not((i, j) in maze.neighbors and (i + 1, j) in maze.neighbors[(i, j)]) and i + 1 < h:
+                    L_Murs.append((i + 1, j))
+
+                if len(L_Murs) != 0:
+                    maze.remove_wall((i, j), L_Murs[randint(0, len(L_Murs)-1)])
+
+        return maze
