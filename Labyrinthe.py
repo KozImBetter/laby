@@ -1,5 +1,6 @@
 # RYSMAN Karim, DEUTSCHE Sacha
-from random import randint
+from random import randint, sample
+
 
 class Maze:
     """
@@ -281,4 +282,45 @@ class Maze:
             for k in range(w - 1):
                 laby.remove_wall((h - 1, k), (h - 1, k + 1))
 
+        return laby
+
+    @classmethod
+    def gen_fusion(cls, h, w):
+        """
+        Génère un labyrinthe en utilisant l'algorithme de fusion.
+
+        :param cls: La classe elle-même.
+        :param h: Le nombre de lignes du labyrinthe.
+        :param w: Le nombre de colonnes du labyrinthe.
+        :return: Un objet Maze représentant le labyrinthe généré.
+        """
+        laby = Maze(h, w)
+
+        # initialisation d'un dico qui contient la cell et son nom
+        nomCell = {(i, j): 1 for i in range(h) for j in range(w)}
+        nom = 0
+
+        # attribution des noms pour chaque cell
+        for i in range(h):
+            for j in range(w):
+                nomCell[(i, j)] = nom
+                nom += 1
+
+        # tri aleatoire de la liste des murs
+        lstWalls = sample(laby.get_walls(), len(laby.get_walls()))
+
+        # parcours de tout les murs
+        for j in range(len(lstWalls)):
+
+            # si le nom des cell est différent, casse le mur et affecte le nom de la première cell à toutes les cell
+            # ayant le meme nom que la deuxième cell
+            if nomCell[lstWalls[j][0]] != nomCell[lstWalls[j][1]]:
+                laby.remove_wall(lstWalls[j][0], lstWalls[j][1])
+                nomPCell = nomCell[lstWalls[j][1]]
+                nomCell[lstWalls[j][1]] = nomCell[lstWalls[j][0]]
+
+                for j in range(h):
+                    for k in range(w):
+                        if nomCell[(j, k)] == nomPCell:
+                            nomCell[(j, k)] = nomCell[lstWalls[j][0]]
         return laby
