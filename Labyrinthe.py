@@ -324,3 +324,53 @@ class Maze:
                         if nomCell[(j, k)] == nomPCell:
                             nomCell[(j, k)] = nomCell[lstWalls[j][0]]
         return laby
+
+    @classmethod
+    def gen_exploration(cls, h, w):
+        """
+        Génère un labyrinthe en utilisant l'algorithme d'exploration.
+
+        :param cls: La classe elle-même.
+        :param h: Le nombre de lignes du labyrinthe.
+        :param w: Le nombre de colonnes du labyrinthe.
+        :return: Un objet Maze représentant le labyrinthe généré.
+        """
+        # Liste de toutes les cellules du labyrinthe
+        lstCell = [(i, j) for i in range(h) for j in range(w)]
+
+        # Sélection aléatoire d'une cellule comme point de départ
+        randomCell = lstCell[randint(0, len(lstCell) - 1)]
+
+        laby = Maze(h, w)  # Création d'une instance de Maze pour représenter le labyrinthe
+        Pile = [randomCell]  # Initialisation de la pile de cellules à visiter
+        Visite = [randomCell]  # Initialisation de la liste des cellules visitées
+
+        # Parcours du labyrinthe en profondeur
+        while len(Pile) > 0:
+            cellAct = Pile[0]  # Sélection de la première cellule de la pile comme cellule actuelle
+            del Pile[0]  # Suppression de la première cellule de la pile
+
+            # Récupération des cellules voisines non visitées de la cellule actuelle
+            test = laby.get_contiguous_cells(cellAct)
+
+            # Vérification des cellules voisines non visitées
+            cellVoisinVisit = True
+            lstVoisinNonVisit = []
+            for i in range(len(test)):
+                # Vérification si les voisins de la cellule actuelle sont visités
+                if test[i] not in Visite:
+                    cellVoisinVisit = False
+                    lstVoisinNonVisit += [test[i]]
+
+            # Ajout des cellules non visitées à la pile pour poursuivre l'exploration
+            if cellVoisinVisit == False:
+                Pile += [cellAct]
+                # Sélection aléatoire d'un voisin non visité
+                hasard = lstVoisinNonVisit[randint(0, len(lstVoisinNonVisit) - 1)]
+                # Casse le mur entre la cellule actuelle et le voisin sélectionné
+                if cellAct != hasard:
+                    laby.remove_wall(cellAct, hasard)
+                    Visite += [hasard]
+                    Pile = [hasard] + Pile
+
+        return laby

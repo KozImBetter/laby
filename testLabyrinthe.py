@@ -36,6 +36,9 @@ print(laby)
 
 laby = Maze.gen_sidewinder(4, 4)
 print(laby)
-"""
+
 laby = Maze.gen_fusion(15,15)
+print(laby)
+"""
+laby = Maze.gen_exploration(15,15)
 print(laby)
