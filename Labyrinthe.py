@@ -374,3 +374,73 @@ class Maze:
                     Pile = [hasard] + Pile
 
         return laby
+
+    @classmethod
+    def gen_wilson(cls, h, w) :
+        """
+        Génère un labyrinthe en utilisant l'algorithme de Wilson.
+
+        :param cls: La classe elle-même.
+        :param h: Le nombre de lignes du labyrinthe.
+        :param w: Le nombre de colonnes du labyrinthe.
+        :return: Un objet Maze représentant le labyrinthe généré.
+        """
+        marque = []
+        lstCell = []
+
+        #liste des cell
+        for i in range(h) :
+            for j in range(w) :
+                lstCell += [(i, j)]
+
+        laby = Maze(h, w)
+
+        #tirage au hasard et marquage de la première cell
+        randCell = lstCell[randint(0, len(lstCell) - 1)]
+        marque += [randCell]
+
+        while len(marque) != h*w :  #tant que les cell ne sont pas toutes marquées
+            trouver = False
+
+            while trouver == False :
+                cellDepart = lstCell[randint(0, len(lstCell) - 1)]
+                if cellDepart not in marque :
+                    trouver = True
+
+            chemin = []
+            chemin += [cellDepart]
+            lstVoisins = laby.get_contiguous_cells(cellDepart)
+            continuer = True
+
+
+            while continuer == True :
+                 #tirage aléatoire dans la liste des voisins, 3 choses à vérifier
+                cell = lstVoisins[randint(0,len(lstVoisins)-1)]
+
+                # 1) si la cellule a deja ete parcourus dans le chemin actuelle -> boucle donc recommencer à zero
+                # -> reinitalisation des variables à celle du début
+                if cell in chemin:
+                    chemin = []
+                    chemin = chemin + [cellDepart]
+                    lstVoisins = laby.get_contiguous_cells(cellDepart)
+
+                # 2) sinon ajout de cette cellule au chemin et stockage des cell voisines
+                else:
+                    chemin = chemin + [cell]
+                    lstVoisins = laby.get_contiguous_cells(cell)
+                # 3) si la cellule est deja marque fin de la boucle while pour casser tous les murs du chemin du parcours
+                # et ajouter toutes les cellules du chemin à la liste marque
+                    if cell in marque:
+                        continuer = False
+
+            #je vais commencer par les marquer
+            for i in range(len(chemin)):
+                if chemin[i] not in marque:
+                    marque = marque + [chemin[i]]
+
+
+            #et je casse tous les murs
+            for j in range(len(chemin)-1):
+                laby.remove_wall(chemin[j],chemin[j+1])
+
+        return laby
