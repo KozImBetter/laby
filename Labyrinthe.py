@@ -242,3 +242,43 @@ class Maze:
                     maze.remove_wall((i, j), L_Murs[randint(0, len(L_Murs)-1)])
 
         return maze
+
+    @classmethod
+    def gen_sidewinder(cls, h, w):
+        """
+        Génère un labyrinthe en utilisant l'algorithme Sidewinder.
+
+        :param cls: La classe elle-même.
+        :param h: Le nombre de lignes du labyrinthe.
+        :param w: Le nombre de colonnes du labyrinthe.
+        :return: Un objet Maze représentant le labyrinthe généré.
+        """
+        laby = Maze(h, w)
+        for i in range(h - 1):
+            seq = []
+            for j in range(w - 1):
+
+                # ajout de la cellule à une sequence
+                seq += [(i, j)]
+
+                # si 0 casser mur EST
+                PoF = randint(0, 1)
+                if PoF == 0:
+                    laby.remove_wall((i, j), (i, j + 1))
+
+                # si 1 casser mur SUD d'une cell au hasard et réinitialiser seq
+                else:
+                    x = randint(0, len(seq) - 1)
+                    laby.remove_wall(seq[x], (seq[x][0] + 1, seq[x][1]))
+                    seq = []
+
+                # ajout de la dernière cell et tirage au hasard d'une cell pour retirer son mur SUD
+                seq += [(i, w - 1)]
+                x = randint(0, len(seq) - 1)
+                laby.remove_wall(seq[x], (seq[x][0] + 1, seq[x][1]))
+
+            # casser tous les murs EST de la dernière ligne du laby
+            for k in range(w - 1):
+                laby.remove_wall((h - 1, k), (h - 1, k + 1))
+
+        return laby
