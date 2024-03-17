@@ -444,3 +444,131 @@ class Maze:
                 laby.remove_wall(chemin[j],chemin[j+1])
 
         return laby
+
+    def overlay(self, content=None):
+        """
+        Rendu en mode texte, sur la sortie standard, \
+        d'un labyrinthe avec du contenu dans les cellules
+        Argument:
+            content (dict) : dictionnaire tq content[cell] contient le caractère à afficher au milieu de la cellule
+        Retour:
+            string
+        """
+        if content is None:
+            content = {(i, j): ' ' for i in range(self.height) for j in range(self.width)}
+        else:
+            # Python >=3.9
+            # content = content | {(i, j): ' ' for i in range(
+            #    self.height) for j in range(self.width) if (i,j) not in content}
+            # Python <3.9
+            new_content = {(i, j): ' ' for i in range(self.height) for j in range(self.width) if (i, j) not in content}
+            content = {**content, **new_content}
+        txt = r""
+        # Première ligne
+        txt += "┏"
+        for j in range(self.width - 1):
+            txt += "━━━┳"
+        txt += "━━━┓\n"
+        txt += "┃"
+        for j in range(self.width - 1):
+            txt += " " + content[(0, j)] + " ┃" if (0, j + 1) not in self.neighbors[(0, j)] else " " + content[
+                (0, j)] + "  "
+        txt += " " + content[(0, self.width - 1)] + " ┃\n"
+        # Lignes normales
+        for i in range(self.height - 1):
+            txt += "┣"
+            for j in range(self.width - 1):
+                txt += "━━━╋" if (i + 1, j) not in self.neighbors[(i, j)] else "   ╋"
+            txt += "━━━┫\n" if (i + 1, self.width - 1) not in self.neighbors[(i, self.width - 1)] else "   ┫\n"
+            txt += "┃"
+            for j in range(self.width):
+                txt += " " + content[(i + 1, j)] + " ┃" if (i + 1, j + 1) not in self.neighbors[(i + 1, j)] else " " + \
+                                                                                                                 content[
+                                                                                                                     (
+                                                                                                                     i + 1,
+                                                                                                                     j)] + "  "
+            txt += "\n"
+        # Bas du tableau
+        txt += "┗"
+        for i in range(self.width - 1):
+            txt += "━━━┻"
+        txt += "━━━┛\n"
+        return txt
+
+    def solve_dfs(self, start: tuple, stop: tuple) -> list:
+        """
+        Résout le labyrinthe en utilisant l'algorithme de recherche en profondeur.
+
+        :param self: La classe elle-même.
+        :param start: Le tuple représentant les coordonnées de la cellule de départ.
+        :param stop: Le tuple représentant les coordonnées de la cellule de destination.
+        :return: Une liste représentant le chemin solution du labyrinthe.
+        """
+        # Initialisation
+        pile = [start]
+        L_marques = [start]
+        pred = {start: start}
+        flag = True
+        # Tant qu'il y a des cellules non marquées
+        while len(L_marques) < self.height*self.width and flag:
+            c = pile.pop()
+
+            if c == stop:
+                flag = False
+
+            else:
+                L_voisines = self.get_reachable_cells(c)
+                for voisines in L_voisines:
+                    if voisines not in L_marques:
+                        L_marques.append(voisines)
+                        pile.append(voisines)
+                        pred[voisines] = c
+
+        # Reconstruction du chemin
+        c = stop
+        path = []
+        while c != start:
+            path.append(c)
+            c = pred[c]
+        path.append(stop)
+
+        return path
+
+    def solve_bfs(self, start: tuple, stop: tuple) -> list:
+        """
+        Résout le labyrinthe en utilisant l'algorithme de recherche en largeur.
+
+        :param self: La classe elle-même.
+        :param start: Le tuple représentant les coordonnées de la cellule de départ.
+        :param stop: Le tuple représentant les coordonnées de la cellule de destination.
+        :return: Une liste représentant le chemin solution du labyrinthe.
+        """
+        # Initialisation
+        file = [start]
+        L_marques = [start]
+        pred = {start: start}
+        flag = True
+        # Tant qu'il y a des cellules non marquées
+        while len(L_marques) < self.height*self.width and flag:
+            c = file.pop(0)
+
+            if c == stop:
+                flag = False
+
+            else:
+                L_voisines = self.get_reachable_cells(c)
+                for voisines in L_voisines:
+                    if voisines not in L_marques:
+                        L_marques.append(voisines)
+                        file.append(voisines)
+                        pred[voisines] = c
+
+        # Reconstruction du chemin
+        c = stop
+        path = []
+        while c != start:
+            path.append(c)
+            c = pred[c]
+        path.append(stop)
+
+        return path
